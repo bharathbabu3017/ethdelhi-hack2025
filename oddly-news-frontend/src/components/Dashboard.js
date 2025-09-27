@@ -15,6 +15,9 @@ import {
   TrendingDown,
   Activity,
   DollarSign,
+  Copy,
+  Check,
+  Globe,
 } from "lucide-react";
 
 const API_BASE_URL = "http://localhost:3001/api";
@@ -31,6 +34,7 @@ export default function Dashboard() {
   const [generationStep, setGenerationStep] = useState("");
   const [countdown, setCountdown] = useState(0);
   const [isPlayerMinimized, setIsPlayerMinimized] = useState(false);
+  const [copiedItems, setCopiedItems] = useState({});
   const audioRef = useRef(null);
 
   useEffect(() => {
@@ -258,6 +262,18 @@ export default function Dashboard() {
     return `${diffDays}d ago`;
   };
 
+  const copyToClipboard = async (text, itemId) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedItems({ ...copiedItems, [itemId]: true });
+      setTimeout(() => {
+        setCopiedItems({ ...copiedItems, [itemId]: false });
+      }, 2000);
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+    }
+  };
+
   const getAgentIcon = (topic) => {
     const icons = {
       politics: "🏛️",
@@ -431,9 +447,32 @@ export default function Dashboard() {
                         <h3 className="text-base font-semibold text-gray-900">
                           {agent.display_name}
                         </h3>
-                        <p className="text-sm text-gray-500">
-                          {agent.ens_subdomain}
-                        </p>
+                        {agent.ens_subdomain && (
+                          <div className="flex items-center space-x-2 mt-1">
+                            <div className="flex items-center space-x-1 text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
+                              <Globe className="w-3 h-3" />
+                              <span className="font-medium">
+                                {agent.ens_subdomain}
+                              </span>
+                            </div>
+                            <button
+                              onClick={() =>
+                                copyToClipboard(
+                                  agent.ens_subdomain,
+                                  `ens-${agent.id}`
+                                )
+                              }
+                              className="p-1 hover:bg-gray-100 rounded transition-colors"
+                              title="Copy ENS subdomain"
+                            >
+                              {copiedItems[`ens-${agent.id}`] ? (
+                                <Check className="w-3 h-3 text-green-600" />
+                              ) : (
+                                <Copy className="w-3 h-3 text-gray-400 hover:text-gray-600" />
+                              )}
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                     {isBriefingRecent(agent.lastGenerated) ? (
@@ -569,6 +608,61 @@ export default function Dashboard() {
                   <p className="text-gray-600 mb-4">
                     {selectedAgent?.description}
                   </p>
+
+                  {/* ENS and Wallet Info */}
+                  <div className="flex flex-wrap gap-3 mb-4">
+                    {selectedAgent?.ens_subdomain && (
+                      <div className="flex items-center space-x-2 bg-blue-50 px-3 py-1 rounded-lg">
+                        <Globe className="w-4 h-4 text-blue-600" />
+                        <span className="text-sm font-medium text-blue-700">
+                          {selectedAgent.ens_subdomain}
+                        </span>
+                        <button
+                          onClick={() =>
+                            copyToClipboard(
+                              selectedAgent.ens_subdomain,
+                              `player-ens-${selectedAgent.id}`
+                            )
+                          }
+                          className="p-1 hover:bg-blue-100 rounded transition-colors"
+                          title="Copy ENS subdomain"
+                        >
+                          {copiedItems[`player-ens-${selectedAgent.id}`] ? (
+                            <Check className="w-3 h-3 text-green-600" />
+                          ) : (
+                            <Copy className="w-3 h-3 text-blue-500 hover:text-blue-700" />
+                          )}
+                        </button>
+                      </div>
+                    )}
+
+                    {selectedAgent?.wallet_address && (
+                      <div className="flex items-center space-x-2 bg-purple-50 px-3 py-1 rounded-lg">
+                        <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                        <span className="text-sm font-mono text-purple-700">
+                          {selectedAgent.wallet_address.slice(0, 6)}...
+                          {selectedAgent.wallet_address.slice(-4)}
+                        </span>
+                        <button
+                          onClick={() =>
+                            copyToClipboard(
+                              selectedAgent.wallet_address,
+                              `player-wallet-${selectedAgent.id}`
+                            )
+                          }
+                          className="p-1 hover:bg-purple-100 rounded transition-colors"
+                          title="Copy wallet address"
+                        >
+                          {copiedItems[`player-wallet-${selectedAgent.id}`] ? (
+                            <Check className="w-3 h-3 text-green-600" />
+                          ) : (
+                            <Copy className="w-3 h-3 text-purple-500 hover:text-purple-700" />
+                          )}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
                   {currentBriefing.createdAt && (
                     <div className="flex items-center space-x-2">
                       <Clock className="w-4 h-4 text-green-600" />
