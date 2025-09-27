@@ -100,7 +100,7 @@ async function main() {
     await reverseEnsLookup(address);
     console.log("---");
   }
-
+}
 
 // Run the script
 main().catch(console.error);
