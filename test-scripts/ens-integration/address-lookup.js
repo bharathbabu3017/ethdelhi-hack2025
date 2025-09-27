@@ -81,7 +81,7 @@ async function main() {
   // Forward resolution: ENS name -> Address
   console.log("🔍 Starting ENS forward resolution on Sepolia testnet...\n");
 
-  const ensNames = ["politics.oddly.eth"];
+  const ensNames = ["icehockey.oddly.eth"];
   for (const name of ensNames) {
     await lookupEnsAddress(name);
     console.log("---");
