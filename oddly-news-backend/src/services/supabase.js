@@ -1,12 +1,20 @@
 const { createClient } = require("@supabase/supabase-js");
 
+// Regular client for reads
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_ANON_KEY
 );
 
+// Admin client for uploads (bypasses RLS)
+const supabaseAdmin = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
+
 async function uploadAudio(audioBuffer, filename) {
-  const { data, error } = await supabase.storage
+  // Use admin client for upload
+  const { data, error } = await supabaseAdmin.storage
     .from("briefing-audio")
     .upload(filename, audioBuffer, {
       contentType: "audio/mpeg",
@@ -14,6 +22,7 @@ async function uploadAudio(audioBuffer, filename) {
 
   if (error) throw error;
 
+  // Get public URL using regular client
   const { data: publicData } = supabase.storage
     .from("briefing-audio")
     .getPublicUrl(filename);
@@ -22,7 +31,8 @@ async function uploadAudio(audioBuffer, filename) {
 }
 
 async function saveBriefing(briefingData) {
-  const { data, error } = await supabase
+  // Use admin client for database writes too
+  const { data, error } = await supabaseAdmin
     .from("briefings")
     .insert(briefingData)
     .select()
@@ -32,6 +42,7 @@ async function saveBriefing(briefingData) {
   return data;
 }
 
+// Keep these using regular client
 async function getAgent(topic) {
   const { data, error } = await supabase
     .from("agents")
@@ -57,6 +68,7 @@ async function getAllAgents() {
 
 module.exports = {
   supabase,
+  supabaseAdmin,
   uploadAudio,
   saveBriefing,
   getAgent,

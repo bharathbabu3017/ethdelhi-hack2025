@@ -74,7 +74,7 @@ INSTRUCTIONS:
 - End with a memorable insight or forward-looking perspective
 - Use clean text only - no special characters, formatting, or stage directions.
 - More focus on prediction markets and slightly less on mainstream news, highlighting metrics wherever needed.
-- Structure as continuous prose suitable for audio delivery
+- Make it like he is talking to the listener rather than just reading the script.
 
 Remember: Your audience tunes in because they want to understand what the smart money is really thinking versus what the headlines are saying. Make every sentence count.`;
 
