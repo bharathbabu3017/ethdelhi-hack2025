@@ -7,6 +7,7 @@
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
     "migrate-agents": "node scripts/migrate.js",
+    "add-agents": "node scripts/add-new-agents.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

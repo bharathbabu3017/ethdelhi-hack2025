@@ -114,6 +114,9 @@ export default function Dashboard() {
         if (data.success) {
           console.log("✅ Loaded recent briefing");
           setCurrentBriefing(data.briefing);
+          // Navigate to detailed player view
+          setIsPlayerMinimized(false);
+          console.log("Navigated to detailed player view");
           return;
         }
       } catch (error) {
@@ -186,6 +189,10 @@ export default function Dashboard() {
         console.log("Setting currentBriefing...");
         setCurrentBriefing(data.briefing);
         console.log("currentBriefing set successfully");
+
+        // Navigate to detailed player view
+        setIsPlayerMinimized(false);
+        console.log("Navigated to detailed player view");
 
         // Audio will be set up when the player UI renders
 
@@ -281,6 +288,10 @@ export default function Dashboard() {
       economy: "📈",
       congress: "🏢",
       breaking: "📰",
+      elon: "🚀",
+      earnings: "💰",
+      sports: "⚽",
+      world: "🌍",
     };
     return icons[topic] || "🤖";
   };
