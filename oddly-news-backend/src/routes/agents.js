@@ -5,6 +5,8 @@ const {
   getAllAgents,
   saveBriefing,
   uploadAudio,
+  supabase,
+  supabaseAdmin,
 } = require("../services/supabase");
 const { getPolymarketData } = require("../services/polymarket");
 const { getNewsContext } = require("../services/perplexity");
@@ -32,15 +34,80 @@ router.get("/:topic", async (req, res) => {
   }
 });
 
-// Generate briefing - FULL PIPELINE
 router.get("/:topic/generate", async (req, res) => {
   try {
-    console.log(`Starting briefing generation for: ${req.params.topic}`);
+    console.log(`Checking for recent briefings for: ${req.params.topic}`);
 
     // 1. Get agent config
     const agent = await getAgent(req.params.topic);
 
-    // 2. Get Polymarket data
+    const thirtyMinutesAgo = new Date(
+      Date.now() - 30 * 60 * 1000
+    ).toISOString();
+
+    console.log(`Looking for briefings newer than: ${thirtyMinutesAgo}`);
+
+    const { data: recentBriefings } = await supabaseAdmin
+      .from("briefings")
+      .select("*")
+      .eq("agent_id", agent.id)
+      .gte("created_at", thirtyMinutesAgo) // Only get briefings from last 30 min
+      .order("created_at", { ascending: false })
+      .limit(1);
+
+    console.log(`Found ${recentBriefings?.length || 0} recent briefings`);
+
+    if (recentBriefings && recentBriefings.length > 0) {
+      const latestBriefing = recentBriefings[0];
+
+      // Ensure we're comparing times in the same timezone
+      // Supabase returns timestamps in UTC, but without 'Z' suffix
+      const briefingTimeStr = latestBriefing.created_at.endsWith("Z")
+        ? latestBriefing.created_at
+        : latestBriefing.created_at + "Z";
+
+      const briefingTime = new Date(briefingTimeStr);
+      const now = new Date();
+      const diffMinutes = (now - briefingTime) / (1000 * 60);
+
+      console.log(
+        `Latest briefing: ${briefingTimeStr}, diff: ${diffMinutes.toFixed(
+          1
+        )} minutes`
+      );
+      console.log(
+        `Now: ${now.toISOString()}, Briefing: ${briefingTime.toISOString()}`
+      );
+
+      if (diffMinutes <= 30) {
+        console.log("Found recent briefing, using cached version");
+        return res.json({
+          success: true,
+          briefing: {
+            id: latestBriefing.id,
+            script: latestBriefing.script,
+            audioUrl: latestBriefing.audio_url,
+            duration: latestBriefing.audio_duration,
+            marketCount: latestBriefing.market_count,
+            createdAt: latestBriefing.created_at,
+          },
+          agent: {
+            topic: agent.topic,
+            displayName: agent.display_name,
+            ensSubdomain: agent.ens_subdomain,
+          },
+          cached: true,
+        });
+      } else {
+        console.log(
+          `Briefing too old: ${diffMinutes.toFixed(1)} minutes > 30 minutes`
+        );
+      }
+    }
+
+    console.log(`No recent briefing found, generating new one...`);
+
+    // 3. Generate new briefing (your existing code continues here...)
     const polymarketData = await getPolymarketData(agent.tag_id);
     if (!polymarketData || polymarketData.length === 0) {
       return res.status(404).json({
@@ -103,6 +170,25 @@ router.get("/:topic/generate", async (req, res) => {
     });
   } catch (error) {
     console.error("Pipeline error:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get("/:topic/history", async (req, res) => {
+  try {
+    const agent = await getAgent(req.params.topic);
+
+    const { data, error } = await supabaseAdmin
+      .from("briefings")
+      .select("*")
+      .eq("agent_id", agent.id)
+      .order("created_at", { ascending: false })
+      .limit(10);
+
+    if (error) throw error;
+
+    res.json({ success: true, briefings: data });
+  } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
