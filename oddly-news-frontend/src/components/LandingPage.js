@@ -142,7 +142,7 @@ export default function OddlyNewsLanding() {
 
             <div className="mt-6 pt-4 border-t border-gray-100">
               <p className="text-xs sm:text-sm text-gray-500 text-center font-medium">
-                Real-time data from Kalshi & Polymarket
+                Real-time data from Polymarket
               </p>
             </div>
           </div>
@@ -172,7 +172,7 @@ export default function OddlyNewsLanding() {
                 Market vs News Analysis
               </h3>
               <p className="text-gray-600 text-base sm:text-lg leading-relaxed max-w-sm mx-auto">
-                AI agents compare headlines vs actual market odds from Kalshi &
+                AI agents compare headlines vs actual market odds from
                 Polymarket, plus real-time news analysis
               </p>
             </div>
@@ -282,7 +282,7 @@ export default function OddlyNewsLanding() {
                 Market Data
               </p>
               <p className="font-bold text-gray-900 text-lg sm:text-xl lg:text-2xl">
-                Kalshi & Polymarket
+                Polymarket
               </p>
             </div>
             <div className="bg-white p-6 sm:p-8 lg:p-10 rounded-2xl shadow-sm hover:shadow-lg transition-shadow">
