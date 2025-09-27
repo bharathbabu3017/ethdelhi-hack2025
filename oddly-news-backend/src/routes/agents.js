@@ -38,74 +38,87 @@ router.get("/:topic/generate", async (req, res) => {
   try {
     console.log(`Checking for recent briefings for: ${req.params.topic}`);
 
+    // Check if user is forcing a fresh generation
+    const forceNew = req.query.force === "true";
+    console.log(`Force new generation: ${forceNew}`);
+
     // 1. Get agent config
     const agent = await getAgent(req.params.topic);
 
-    const thirtyMinutesAgo = new Date(
-      Date.now() - 30 * 60 * 1000
-    ).toISOString();
+    // Only check for recent briefings if not forcing new generation
+    if (!forceNew) {
+      const thirtyMinutesAgo = new Date(
+        Date.now() - 30 * 60 * 1000
+      ).toISOString();
 
-    console.log(`Looking for briefings newer than: ${thirtyMinutesAgo}`);
+      console.log(`Looking for briefings newer than: ${thirtyMinutesAgo}`);
 
-    const { data: recentBriefings } = await supabaseAdmin
-      .from("briefings")
-      .select("*")
-      .eq("agent_id", agent.id)
-      .gte("created_at", thirtyMinutesAgo) // Only get briefings from last 30 min
-      .order("created_at", { ascending: false })
-      .limit(1);
+      const { data: recentBriefings } = await supabaseAdmin
+        .from("briefings")
+        .select("*")
+        .eq("agent_id", agent.id)
+        .gte("created_at", thirtyMinutesAgo) // Only get briefings from last 30 min
+        .order("created_at", { ascending: false })
+        .limit(1);
 
-    console.log(`Found ${recentBriefings?.length || 0} recent briefings`);
+      console.log(`Found ${recentBriefings?.length || 0} recent briefings`);
 
-    if (recentBriefings && recentBriefings.length > 0) {
-      const latestBriefing = recentBriefings[0];
+      if (recentBriefings && recentBriefings.length > 0) {
+        const latestBriefing = recentBriefings[0];
 
-      // Ensure we're comparing times in the same timezone
-      // Supabase returns timestamps in UTC, but without 'Z' suffix
-      const briefingTimeStr = latestBriefing.created_at.endsWith("Z")
-        ? latestBriefing.created_at
-        : latestBriefing.created_at + "Z";
+        // Ensure we're comparing times in the same timezone
+        // Supabase returns timestamps in UTC, but without 'Z' suffix
+        const briefingTimeStr = latestBriefing.created_at.endsWith("Z")
+          ? latestBriefing.created_at
+          : latestBriefing.created_at + "Z";
 
-      const briefingTime = new Date(briefingTimeStr);
-      const now = new Date();
-      const diffMinutes = (now - briefingTime) / (1000 * 60);
+        const briefingTime = new Date(briefingTimeStr);
+        const now = new Date();
+        const diffMinutes = (now - briefingTime) / (1000 * 60);
 
-      console.log(
-        `Latest briefing: ${briefingTimeStr}, diff: ${diffMinutes.toFixed(
-          1
-        )} minutes`
-      );
-      console.log(
-        `Now: ${now.toISOString()}, Briefing: ${briefingTime.toISOString()}`
-      );
-
-      if (diffMinutes <= 30) {
-        console.log("Found recent briefing, using cached version");
-        return res.json({
-          success: true,
-          briefing: {
-            id: latestBriefing.id,
-            script: latestBriefing.script,
-            audioUrl: latestBriefing.audio_url,
-            duration: latestBriefing.audio_duration,
-            marketCount: latestBriefing.market_count,
-            createdAt: latestBriefing.created_at,
-          },
-          agent: {
-            topic: agent.topic,
-            displayName: agent.display_name,
-            ensSubdomain: agent.ens_subdomain,
-          },
-          cached: true,
-        });
-      } else {
         console.log(
-          `Briefing too old: ${diffMinutes.toFixed(1)} minutes > 30 minutes`
+          `Latest briefing: ${briefingTimeStr}, diff: ${diffMinutes.toFixed(
+            1
+          )} minutes`
         );
+        console.log(
+          `Now: ${now.toISOString()}, Briefing: ${briefingTime.toISOString()}`
+        );
+
+        if (diffMinutes <= 30) {
+          console.log("Found recent briefing, using cached version");
+          return res.json({
+            success: true,
+            briefing: {
+              id: latestBriefing.id,
+              script: latestBriefing.script,
+              audioUrl: latestBriefing.audio_url,
+              duration: latestBriefing.audio_duration,
+              marketCount: latestBriefing.market_count,
+              marketStats: latestBriefing.market_stats,
+              aiInsights: latestBriefing.ai_insights,
+              createdAt: latestBriefing.created_at,
+            },
+            agent: {
+              topic: agent.topic,
+              displayName: agent.display_name,
+              ensSubdomain: agent.ens_subdomain,
+            },
+            cached: true,
+          });
+        } else {
+          console.log(
+            `Briefing too old: ${diffMinutes.toFixed(1)} minutes > 30 minutes`
+          );
+        }
       }
     }
 
-    console.log(`No recent briefing found, generating new one...`);
+    console.log(
+      `${
+        forceNew ? "Force generating" : "No recent briefing found, generating"
+      } new briefing...`
+    );
 
     // 3. Generate new briefing (your existing code continues here...)
     const polymarketData = await getPolymarketData(agent.tag_id);
@@ -122,11 +135,18 @@ router.get("/:topic/generate", async (req, res) => {
     // 4. Get news context
     const newsData = await getNewsContext(analysis.searchQueries);
 
-    // 5. Generate script
-    const script = await generateScript(req.params.topic, analysis, newsData);
+    // 5. Generate script and insights
+    const scriptResult = await generateScript(
+      req.params.topic,
+      analysis,
+      newsData
+    );
 
     // 6. Generate audio
-    const audioResult = await generateAudio(script, agent.voice_id);
+    const audioResult = await generateAudio(
+      scriptResult.script,
+      agent.voice_id
+    );
 
     // 7. Upload to Supabase Storage
     const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, "-");
@@ -136,13 +156,15 @@ router.get("/:topic/generate", async (req, res) => {
     // 8. Save briefing to database
     const briefingData = {
       agent_id: agent.id,
-      script: script,
+      script: scriptResult.script,
       audio_url: audioUrl,
       audio_duration: audioResult.estimatedDuration,
       market_count: polymarketData.length,
       news_query_count: analysis.searchQueries.length,
       polymarket_data: polymarketData,
       news_data: newsData,
+      market_stats: analysis.marketStats,
+      ai_insights: scriptResult.aiInsights,
       metadata: {
         timestamp,
         filename,
@@ -160,6 +182,8 @@ router.get("/:topic/generate", async (req, res) => {
         audioUrl: savedBriefing.audio_url,
         duration: savedBriefing.audio_duration,
         marketCount: savedBriefing.market_count,
+        marketStats: savedBriefing.market_stats,
+        aiInsights: savedBriefing.ai_insights,
         createdAt: savedBriefing.created_at,
       },
       agent: {

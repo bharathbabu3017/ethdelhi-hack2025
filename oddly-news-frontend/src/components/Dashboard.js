@@ -11,6 +11,10 @@ import {
   ExternalLink,
   SkipBack,
   SkipForward,
+  TrendingUp,
+  TrendingDown,
+  Activity,
+  DollarSign,
 } from "lucide-react";
 
 const API_BASE_URL = "http://localhost:3001/api";
@@ -267,8 +271,104 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-xl text-gray-600">Loading agents...</div>
+      <div className="min-h-screen bg-white">
+        {/* Header */}
+        <header className="bg-white border-b border-gray-200 px-6 py-4 backdrop-blur-sm bg-white/95">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-700 rounded-xl flex items-center justify-center">
+                <Radio className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">oddly.news</h1>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
+              <div className="h-6 bg-gray-200 rounded-full w-16 animate-pulse"></div>
+            </div>
+          </div>
+        </header>
+
+        {/* Loading Content */}
+        <div className="max-w-7xl mx-auto px-6 py-8 pb-24">
+          {/* Skeleton Title */}
+          <div className="text-center mb-12">
+            <div className="h-12 bg-gray-300 rounded-lg w-96 mx-auto mb-4 animate-pulse"></div>
+            <div className="h-6 bg-gray-200 rounded w-full max-w-3xl mx-auto mb-2 animate-pulse"></div>
+            <div className="h-6 bg-gray-200 rounded w-2/3 max-w-2xl mx-auto animate-pulse"></div>
+          </div>
+
+          {/* Skeleton Agent Cards */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="bg-white rounded-xl border border-gray-200 p-6 animate-pulse"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gray-300 rounded-lg"></div>
+                    <div>
+                      <div className="h-4 bg-gray-300 rounded w-24 mb-1"></div>
+                      <div className="h-3 bg-gray-200 rounded w-20"></div>
+                    </div>
+                  </div>
+                  <div className="w-12 h-5 bg-gray-200 rounded-full"></div>
+                </div>
+
+                <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded w-3/4 mb-4"></div>
+
+                <div className="flex items-center justify-between mb-4 text-sm">
+                  <div className="h-3 bg-gray-200 rounded w-16"></div>
+                  <div className="h-3 bg-gray-200 rounded w-12"></div>
+                </div>
+
+                <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div className="h-3 bg-gray-200 rounded w-20"></div>
+                    <div className="h-3 bg-gray-200 rounded w-16"></div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="w-full h-12 bg-gray-300 rounded-lg"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Loading Bottom Player */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gray-200">
+              <div className="bg-gray-300 h-1 rounded-full w-0"></div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4 flex-1">
+                <div className="w-12 h-12 bg-gray-300 rounded-lg animate-pulse"></div>
+                <div className="min-w-0 flex-1">
+                  <div className="h-4 bg-gray-300 rounded w-32 mb-1"></div>
+                  <div className="h-3 bg-gray-200 rounded w-40"></div>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-4">
+                <div className="w-8 h-8 bg-gray-200 rounded p-2"></div>
+                <div className="w-12 h-12 bg-gray-300 rounded-full"></div>
+                <div className="w-8 h-8 bg-gray-200 rounded p-2"></div>
+              </div>
+
+              <div className="flex items-center space-x-4 flex-1 justify-end">
+                <div className="h-3 bg-gray-200 rounded w-16"></div>
+                <div className="w-8 h-8 bg-gray-200 rounded p-2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -491,27 +591,170 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
-            {/* Stats Grid */}
-            <div className="grid grid-cols-3 gap-6 mb-8">
-              <div className="bg-white rounded-xl p-6 text-center shadow-sm">
-                <div className="text-3xl font-bold text-gray-900 mb-1">
-                  {currentBriefing.marketCount}
+            {/* Market Overview Stats */}
+            {currentBriefing.marketStats && (
+              <div className="mb-8">
+                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
+                  <BarChart3 className="w-5 h-5 text-green-600" />
+                  <span>Market Overview</span>
+                </h3>
+
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                  <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <DollarSign className="w-4 h-4 text-green-600" />
+                      <span className="text-sm text-gray-600">
+                        Total Volume
+                      </span>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900">
+                      {currentBriefing.marketStats.totalVolume}
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Activity className="w-4 h-4 text-blue-600" />
+                      <span className="text-sm text-gray-600">
+                        Active Markets
+                      </span>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900">
+                      {currentBriefing.marketStats.activeMarkets}
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <BarChart3 className="w-4 h-4 text-purple-600" />
+                      <span className="text-sm text-gray-600">
+                        Total Markets
+                      </span>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900">
+                      {currentBriefing.marketStats.totalMarkets}
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Zap className="w-4 h-4 text-orange-600" />
+                      <span className="text-sm text-gray-600">Featured</span>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900">
+                      {currentBriefing.marketStats.featuredMarkets}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-sm text-gray-500">Markets Analyzed</div>
+
+                {/* Top Events */}
+                {currentBriefing.marketStats.topEvents &&
+                  currentBriefing.marketStats.topEvents.length > 0 && (
+                    <div>
+                      <h4 className="text-lg font-semibold text-gray-900 mb-3">
+                        Top Market Events
+                      </h4>
+                      <div className="grid gap-3">
+                        {currentBriefing.marketStats.topEvents.map(
+                          (event, index) => (
+                            <div
+                              key={index}
+                              className="bg-white rounded-lg p-4 shadow-sm border border-gray-100"
+                            >
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <h5 className="font-semibold text-gray-900 mb-2">
+                                    {event.title}
+                                  </h5>
+                                  <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                                    <div className="flex items-center space-x-1">
+                                      <DollarSign className="w-3 h-3" />
+                                      <span>Volume: {event.volume}</span>
+                                    </div>
+                                    <div className="flex items-center space-x-1">
+                                      <Activity className="w-3 h-3" />
+                                      <span>24h: {event.volume24hr}</span>
+                                    </div>
+                                    <div className="flex items-center space-x-1">
+                                      <BarChart3 className="w-3 h-3" />
+                                      <span>Liquidity: {event.liquidity}</span>
+                                    </div>
+                                    <div className="flex items-center space-x-1">
+                                      <Clock className="w-3 h-3" />
+                                      <span>
+                                        Comments: {event.commentCount}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex flex-col items-end space-y-1">
+                                  {event.featured && (
+                                    <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-medium">
+                                      Featured
+                                    </span>
+                                  )}
+                                  <span
+                                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                      event.active
+                                        ? "bg-green-100 text-green-700"
+                                        : "bg-gray-100 text-gray-700"
+                                    }`}
+                                  >
+                                    {event.active ? "Active" : "Inactive"}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  )}
               </div>
-              <div className="bg-white rounded-xl p-6 text-center shadow-sm">
-                <div className="text-3xl font-bold text-gray-900 mb-1">
-                  {Math.round(currentBriefing.duration)}s
+            )}
+
+            {/* AI Insights Section */}
+            {currentBriefing.aiInsights &&
+              currentBriefing.aiInsights.length > 0 && (
+                <div className="bg-white rounded-xl shadow-lg mb-8">
+                  <div className="p-6 border-b border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                      <Zap className="w-5 h-5 text-blue-600" />
+                      <span>AI-Driven Market Insights</span>
+                    </h3>
+                  </div>
+                  <div className="p-6">
+                    <div className="grid gap-4">
+                      {currentBriefing.aiInsights.map((insight, index) => (
+                        <div
+                          key={index}
+                          className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100"
+                        >
+                          <div className="flex items-start space-x-3">
+                            <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                              <Zap className="w-4 h-4 text-blue-600" />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-gray-900 mb-1">
+                                {insight.title}
+                              </h4>
+                              <p className="text-gray-700 text-sm leading-relaxed">
+                                {insight.content}
+                              </p>
+                              <div className="mt-2">
+                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                                  {insight.source}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-sm text-gray-500">Report Duration</div>
-              </div>
-              <div className="bg-white rounded-xl p-6 text-center shadow-sm">
-                <div className="text-3xl font-bold text-green-600 mb-1">
-                  Live
-                </div>
-                <div className="text-sm text-gray-500">Status</div>
-              </div>
-            </div>
+              )}
+
             {/* Transcript Section */}
             <div className="bg-white rounded-xl shadow-lg">
               <div className="p-6 border-b border-gray-200">
