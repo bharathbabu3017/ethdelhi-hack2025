@@ -6,19 +6,20 @@ async function extractMarketInsights(polymarketData) {
 
   const prompt = `Analyze this prediction market data and provide:
 
-1. Key market insights (brief summary)
-2. Generate exactly ${searchQueryCount} specific search queries for the most important/highest volume markets
+1. Key market insights (brief summary with current odds and volumes)
+2. Generate exactly ${searchQueryCount} simple search queries aimed at finding WHY each market has its current odds
+
+Create short, natural search queries focused on causes and reasons:
 
 Data: ${JSON.stringify(polymarketData)}
 
 Format your response as JSON:
 {
-  "insights": "Brief analysis with key stats",
-  "searchQueries": ["query1", "query2", "query3"]
+  "insights": "Brief analysis of current market state", 
+  "searchQueries": ["shutdown risk October 2025", "Fed cut reasons December", "Trump Nobel why unlikely"]
 }
 
-Only include ${searchQueryCount} search queries for the most newsworthy markets.`;
-
+Make queries 2-5 words that search for explanations, causes, or recent developments. Have like one query per market.`;
   try {
     const response = await fetch(OPENAI_API_URL, {
       method: "POST",
@@ -27,7 +28,7 @@ Only include ${searchQueryCount} search queries for the most newsworthy markets.
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-5-mini-2025-08-07",
+        model: "gpt-4.1-mini-2025-04-14",
         messages: [{ role: "user", content: prompt }],
       }),
     });
@@ -53,31 +54,30 @@ Only include ${searchQueryCount} search queries for the most newsworthy markets.
 }
 
 async function generateScript(topic, analysis, newsData) {
-  const prompt = `You are Marcus Chen, a seasoned news anchor for oddly.news, delivering your signature "Markets vs Media" radio briefing. Your show analyzes talks about prediction markets and the mainstream news and gives a summary of the news.
-
-TOPIC: ${topic}
-
-PREDICTION MARKET DATA:
-${analysis.insights}
-
-MAINSTREAM NEWS COVERAGE:
-${JSON.stringify(newsData)}
-
-INSTRUCTIONS:
-- Create a 60-90 second radio script that flows naturally for text-to-speech
-- Lead with the most compelling angle or contradiction between markets and media
-- Include 1-2 specific, interesting prediction market statistics that illustrate broader trends
-- Maintain an authoritative yet conversational tone - think NPR meets financial analysis
-- Focus on clarity over complexity - explain why the difference between markets and media matters
-- Dont make each sentence too long, keep it short and concise.
-- When dealing with numbers, generate it in text format, not numbers.
-- End with a memorable insight or forward-looking perspective
-- Use clean text only - no special characters, formatting, or stage directions.
-- More focus on prediction markets and slightly less on mainstream news, highlighting metrics wherever needed.
-- Make it like he is talking to the listener rather than just reading the script.
-
-Remember: Your audience tunes in because they want to understand what the smart money is really thinking versus what the headlines are saying. Make every sentence count.`;
-
+  const prompt = `You are Marcus Chen, delivering an oddly.news market intelligence briefing. You analyze prediction markets to explain what smart money is thinking and why.
+    
+    PREDICTION MARKET DATA:
+    ${analysis.insights}
+    
+    CONTEXT AND REASONING:
+    ${JSON.stringify(newsData)}
+    
+    INSTRUCTIONS:
+    - Create a 60-90 second radio script focusing on market intelligence with explanations
+    - Start with the most compelling market position and explain WHY it exists
+    - Use the context data to explain the reasoning behind market odds
+    - Cover key prediction market metrics (odds, volumes, movements)
+    - Explain what factors are driving the market sentiment
+    - Maintain authoritative yet conversational tone - talking TO the listener
+    - Keep sentences short and concise for audio delivery
+    - Convert all numbers to text format (82% becomes "eighty-two percent")
+    - End with what this means for listeners or forward-looking insight
+    - Strictly under 90 seconds when spoken
+    - Use clean text only - no special characters or formatting
+    
+    Focus: "Here's what the markets are saying, here's WHY they're saying it, and here's what it means for you." Use the context to explain the reasoning behind market positions.
+    
+    Remember: Your audience wants to understand prediction market intelligence with the context that explains why smart money is positioned this way.`;
   try {
     const response = await fetch(OPENAI_API_URL, {
       method: "POST",
@@ -86,7 +86,7 @@ Remember: Your audience tunes in because they want to understand what the smart 
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-5-mini-2025-08-07",
+        model: "gpt-4.1-mini-2025-04-14",
         messages: [{ role: "user", content: prompt }],
       }),
     });
