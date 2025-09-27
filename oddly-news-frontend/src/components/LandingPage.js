@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { BarChart3, Mic, Cpu } from "lucide-react";
 
 export default function OddlyNewsLanding() {
@@ -31,9 +32,11 @@ export default function OddlyNewsLanding() {
             >
               API Access
             </a>
-            <button className="bg-gray-900 text-white px-4 lg:px-6 py-2 lg:py-3 rounded-lg hover:bg-gray-800 transition-colors text-sm lg:text-base font-medium">
-              Launch App
-            </button>
+            <Link to="/dashboard">
+              <button className="bg-gray-900 text-white px-4 lg:px-6 py-2 lg:py-3 rounded-lg hover:bg-gray-800 transition-colors text-sm lg:text-base font-medium">
+                Launch App
+              </button>
+            </Link>
           </nav>
           {/* Mobile menu button */}
           <button className="md:hidden p-2 rounded-lg hover:bg-gray-100">
@@ -75,74 +78,63 @@ export default function OddlyNewsLanding() {
               briefings. Our agents analyze prediction markets and breaking news
               to reveal what traders actually believe vs what headlines claim.
             </p>
-            <div className="flex justify-center lg:justify-start">
-              <button className="bg-green-600 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-lg text-lg sm:text-xl hover:bg-green-700 font-medium transition-colors shadow-lg hover:shadow-xl">
-                Launch App
-              </button>
-            </div>
           </div>
 
           {/* Right Side - Live Data Widget */}
-          <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-6 lg:p-8 shadow-lg hover:shadow-xl transition-shadow">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900">
-                Market vs Headlines
+          <div className="bg-white border border-gray-200 rounded-xl p-3 sm:p-4 lg:p-5 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900">
+                AI Agent Briefings
               </h3>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-xs sm:text-sm text-gray-600 font-medium">
-                  Live
-                </span>
+              <div className="flex items-center space-x-1">
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-xs text-gray-600 font-medium">Live</span>
               </div>
             </div>
 
-            <div className="space-y-3 sm:space-y-4">
-              <div className="flex justify-between items-center py-3 sm:py-4 border-b border-gray-100">
-                <span className="text-sm sm:text-base text-gray-700 font-medium">
-                  Election Outcome
+            <div className="space-y-2 sm:space-y-3">
+              <div className="flex justify-between items-center py-2 sm:py-3 border-b border-gray-100">
+                <span className="text-xs sm:text-sm text-gray-700 font-medium">
+                  Politics Agent
                 </span>
                 <div className="text-right">
-                  <span className="text-lg sm:text-xl font-bold text-green-600">
-                    67%
+                  <span className="text-sm sm:text-base font-bold text-green-600">
+                    Active
                   </span>
-                  <div className="text-xs sm:text-sm text-gray-500">
-                    vs 45% headlines
-                  </div>
+                  <div className="text-xs text-gray-500">2m briefing ready</div>
                 </div>
               </div>
 
-              <div className="flex justify-between items-center py-3 sm:py-4 border-b border-gray-100">
-                <span className="text-sm sm:text-base text-gray-700 font-medium">
-                  Fed Rate Cut
+              <div className="flex justify-between items-center py-2 sm:py-3 border-b border-gray-100">
+                <span className="text-xs sm:text-sm text-gray-700 font-medium">
+                  Crypto Markets
                 </span>
                 <div className="text-right">
-                  <span className="text-lg sm:text-xl font-bold text-red-500">
-                    23%
+                  <span className="text-sm sm:text-base font-bold text-green-600">
+                    Active
                   </span>
-                  <div className="text-xs sm:text-sm text-gray-500">
-                    vs 78% headlines
-                  </div>
+                  <div className="text-xs text-gray-500">90s analysis live</div>
                 </div>
               </div>
 
-              <div className="flex justify-between items-center py-3 sm:py-4">
-                <span className="text-sm sm:text-base text-gray-700 font-medium">
-                  Tech Stock Rally
+              <div className="flex justify-between items-center py-2 sm:py-3">
+                <span className="text-xs sm:text-sm text-gray-700 font-medium">
+                  Economy Watch
                 </span>
                 <div className="text-right">
-                  <span className="text-lg sm:text-xl font-bold text-green-600">
-                    89%
+                  <span className="text-sm sm:text-base font-bold text-green-600">
+                    Active
                   </span>
-                  <div className="text-xs sm:text-sm text-gray-500">
-                    vs 34% headlines
+                  <div className="text-xs text-gray-500">
+                    Market vs news gap
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-gray-100">
-              <p className="text-xs sm:text-sm text-gray-500 text-center font-medium">
-                Real-time data from Polymarket
+            <div className="mt-4 pt-3 border-t border-gray-100">
+              <p className="text-xs text-gray-500 text-center font-medium">
+                Real-time AI analysis from Polymarket data
               </p>
             </div>
           </div>

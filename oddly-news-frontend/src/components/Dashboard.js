@@ -170,12 +170,12 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <Radio className="w-8 h-8 text-blue-600" />
+            <Radio className="w-8 h-8 text-green-600" />
             <div>
               <h1 className="text-2xl font-bold text-gray-900">oddly.news</h1>
               <p className="text-sm text-gray-600">
@@ -209,7 +209,7 @@ export default function Dashboard() {
                         {getAgentIcon(agent.topic)}
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900">
+                        <h3 className="text-base font-semibold text-gray-900">
                           {agent.display_name}
                         </h3>
                         <p className="text-sm text-gray-500">
@@ -238,11 +238,11 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <button
                       onClick={() => generateOrLoadBriefing(agent.topic)}
                       disabled={generatingAgent === agent.topic}
-                      className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                      className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                     >
                       {generatingAgent === agent.topic ? (
                         <>
@@ -272,7 +272,7 @@ export default function Dashboard() {
             {/* Back Button */}
             <button
               onClick={() => setCurrentBriefing(null)}
-              className="mb-6 text-blue-600 hover:text-blue-700 flex items-center space-x-2"
+              className="mb-6 text-green-600 hover:text-green-700 flex items-center space-x-2"
             >
               <SkipBack className="w-4 h-4" />
               <span>Back to Stations</span>
@@ -281,7 +281,7 @@ export default function Dashboard() {
             {/* Album Art Style Player */}
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
               {/* Cover Art Section */}
-              <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-12 text-center text-white">
+              <div className="bg-gradient-to-br from-green-500 to-green-700 p-12 text-center text-white">
                 <div className="w-32 h-32 mx-auto mb-6 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
                   <div className="text-4xl">
                     {getAgentIcon(selectedAgent?.topic)}
@@ -290,9 +290,9 @@ export default function Dashboard() {
                 <h1 className="text-2xl font-bold mb-2">
                   {selectedAgent?.display_name}
                 </h1>
-                <p className="text-blue-100">{selectedAgent?.ens_subdomain}</p>
+                <p className="text-green-100">{selectedAgent?.ens_subdomain}</p>
                 {currentBriefing.createdAt && (
-                  <p className="text-blue-200 text-sm mt-2">
+                  <p className="text-green-200 text-sm mt-2">
                     Generated {getTimeAgo(currentBriefing.createdAt)}
                   </p>
                 )}
@@ -309,7 +309,7 @@ export default function Dashboard() {
                       onClick={handleSeek}
                     >
                       <div
-                        className="bg-blue-600 h-2 rounded-full transition-all"
+                        className="bg-green-600 h-2 rounded-full transition-all"
                         style={{ width: `${(currentTime / duration) * 100}%` }}
                       ></div>
                     </div>
@@ -327,7 +327,7 @@ export default function Dashboard() {
 
                     <button
                       onClick={togglePlayPause}
-                      className="bg-blue-600 text-white p-4 rounded-full hover:bg-blue-700 transition-colors shadow-lg"
+                      className="bg-green-600 text-white p-4 rounded-full hover:bg-green-700 transition-colors shadow-lg"
                     >
                       {isPlaying ? (
                         <Pause className="w-8 h-8" />
@@ -368,7 +368,9 @@ export default function Dashboard() {
                     <div className="text-sm text-gray-500">Duration</div>
                   </div>
                   <div className="text-center p-3 bg-gray-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">Live</div>
+                    <div className="text-2xl font-bold text-green-600">
+                      Live
+                    </div>
                     <div className="text-sm text-gray-500">Status</div>
                   </div>
                 </div>
@@ -379,7 +381,7 @@ export default function Dashboard() {
             <div className="mt-8 bg-white rounded-xl shadow-lg">
               <div className="p-6 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
-                  <Volume2 className="w-5 h-5 text-blue-600" />
+                  <Volume2 className="w-5 h-5 text-green-600" />
                   <span>Live Transcript</span>
                 </h3>
               </div>
