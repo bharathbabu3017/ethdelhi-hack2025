@@ -1,16 +1,27 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { BarChart3, Mic, Cpu } from "lucide-react";
+import {
+  BarChart3,
+  Mic,
+  Cpu,
+  Radio,
+  Play,
+  Zap,
+  TrendingUp,
+} from "lucide-react";
 
 export default function OddlyNewsLanding() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="px-4 sm:px-6 lg:px-8 py-4 lg:py-6">
+      <header className="bg-white border-b border-gray-200 px-6 py-4 backdrop-blur-sm bg-white/95">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center">
-            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
-              oddly.news
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-700 rounded-xl flex items-center justify-center">
+              <Radio className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">oddly.news</h1>
             </div>
           </div>
           <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
@@ -33,8 +44,9 @@ export default function OddlyNewsLanding() {
               API Access
             </a>
             <Link to="/dashboard">
-              <button className="bg-gray-900 text-white px-4 lg:px-6 py-2 lg:py-3 rounded-lg hover:bg-gray-800 transition-colors text-sm lg:text-base font-medium">
-                Launch App
+              <button className="bg-green-600 text-white px-4 lg:px-6 py-2 lg:py-3 rounded-lg hover:bg-green-700 transition-colors text-sm lg:text-base font-medium flex items-center space-x-2">
+                <Play className="w-4 h-4" />
+                <span>Launch App</span>
               </button>
             </Link>
           </nav>
@@ -58,84 +70,162 @@ export default function OddlyNewsLanding() {
       </header>
 
       {/* Hero Section */}
-      <section className="px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+      <section className="px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left Side - Main Content */}
           <div className="text-center lg:text-left">
+            <div className="inline-flex items-center space-x-2 bg-green-50 text-green-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <TrendingUp className="w-4 h-4" />
+              <span>Real Money, Real Insights</span>
+            </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-900 leading-tight mb-6 lg:mb-8">
-              Discover
+              Get Your
               <br />
-              The{" "}
               <span className="text-green-600">
-                Oddly
+                2-Minute
                 <br />
-                Accurate
-              </span>{" "}
-              Truth
+                Market Report
+              </span>
             </h1>
             <p className="text-lg sm:text-xl lg:text-xl text-gray-600 mb-8 lg:mb-10 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-              Get news backed by real money delivered through AI-powered audio
-              briefings. Our agents analyze prediction markets and breaking news
-              to reveal what traders actually believe vs what headlines claim.
+              AI agents analyze prediction markets and breaking news to deliver
+              personalized audio briefings. Discover what traders actually
+              believe vs what headlines claim.
             </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <Link to="/dashboard">
+                <button className="bg-green-600 text-white px-8 py-4 rounded-xl hover:bg-green-700 transition-all text-lg font-semibold flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                  <Play className="w-5 h-5" />
+                  <span>Start Listening</span>
+                </button>
+              </Link>
+              <button className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl hover:border-green-600 hover:text-green-600 transition-all text-lg font-semibold flex items-center justify-center space-x-3">
+                <Zap className="w-5 h-5" />
+                <span>See Demo</span>
+              </button>
+            </div>
           </div>
 
-          {/* Right Side - Live Data Widget */}
-          <div className="bg-white border border-gray-200 rounded-xl p-3 sm:p-4 lg:p-5 shadow-lg hover:shadow-xl transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900">
-                AI Agent Briefings
-              </h3>
-              <div className="flex items-center space-x-1">
-                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-xs text-gray-600 font-medium">Live</span>
+          {/* Right Side - Audio Player Demo */}
+          <div className="bg-white border border-gray-200 rounded-2xl shadow-xl hover:shadow-2xl transition-all overflow-hidden">
+            {/* Player Header */}
+            <div className="bg-gradient-to-r from-green-500 to-green-700 p-4 text-white">
+              <div className="flex items-center space-x-3 mb-2">
+                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                  <span className="text-xl">🏛️</span>
+                </div>
+                <div>
+                  <h3 className="text-base font-bold">
+                    Political Markets Expert
+                  </h3>
+                  <p className="text-green-100 text-xs">politics.oddly.news</p>
+                </div>
+              </div>
+              <div className="text-green-100 text-xs">
+                Generated 2h ago • 2:15 duration
               </div>
             </div>
 
-            <div className="space-y-2 sm:space-y-3">
-              <div className="flex justify-between items-center py-2 sm:py-3 border-b border-gray-100">
-                <span className="text-xs sm:text-sm text-gray-700 font-medium">
-                  Politics Agent
-                </span>
-                <div className="text-right">
-                  <span className="text-sm sm:text-base font-bold text-green-600">
-                    Active
-                  </span>
-                  <div className="text-xs text-gray-500">2m briefing ready</div>
+            {/* Progress Bar */}
+            <div className="px-4 py-3 bg-gray-50">
+              <div className="flex items-center space-x-2 mb-2">
+                <span className="text-xs text-gray-500">0:00</span>
+                <div className="flex-1 bg-gray-200 h-1 rounded-full">
+                  <div className="bg-green-600 h-1 rounded-full w-1/3 transition-all"></div>
                 </div>
+                <span className="text-xs text-gray-500">2:15</span>
               </div>
 
-              <div className="flex justify-between items-center py-2 sm:py-3 border-b border-gray-100">
-                <span className="text-xs sm:text-sm text-gray-700 font-medium">
-                  Crypto Markets
-                </span>
-                <div className="text-right">
-                  <span className="text-sm sm:text-base font-bold text-green-600">
-                    Active
-                  </span>
-                  <div className="text-xs text-gray-500">90s analysis live</div>
-                </div>
-              </div>
+              {/* Player Controls */}
+              <div className="flex items-center justify-center space-x-3">
+                <button className="text-gray-400 hover:text-gray-600 p-1">
+                  <svg
+                    className="w-4 h-4"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z" />
+                  </svg>
+                </button>
 
-              <div className="flex justify-between items-center py-2 sm:py-3">
-                <span className="text-xs sm:text-sm text-gray-700 font-medium">
-                  Economy Watch
-                </span>
-                <div className="text-right">
-                  <span className="text-sm sm:text-base font-bold text-green-600">
-                    Active
-                  </span>
-                  <div className="text-xs text-gray-500">
-                    Market vs news gap
+                <button className="bg-green-600 text-white p-2 rounded-full hover:bg-green-700 transition-colors shadow-lg">
+                  <Play className="w-4 h-4 ml-0.5" />
+                </button>
+
+                <button className="text-gray-400 hover:text-gray-600 p-1">
+                  <svg
+                    className="w-4 h-4"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798L4.555 5.168z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* News Headlines Preview */}
+            <div className="p-4">
+              <h4 className="font-semibold text-gray-900 mb-3 flex items-center space-x-2">
+                <Mic className="w-4 h-4 text-green-600" />
+                <span>Today's Market Intelligence</span>
+              </h4>
+
+              <div className="space-y-2">
+                <div className="flex items-start space-x-2 p-2 bg-green-50 rounded-lg border border-green-100">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      Election markets show 67% probability shift
+                    </p>
+                    <p className="text-xs text-gray-600 mt-1">
+                      Polymarket data vs mainstream polls analysis
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-2 p-2 bg-gray-50 rounded-lg">
+                  <div className="w-2 h-2 bg-gray-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">
+                      Policy prediction markets surge 15%
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Breaking: Fed rate decision impact
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-2 p-2 bg-gray-50 rounded-lg">
+                  <div className="w-2 h-2 bg-gray-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">
+                      Congressional betting odds update
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Real money vs headline sentiment gap
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-gray-100">
-              <p className="text-xs text-gray-500 text-center font-medium">
-                Real-time AI analysis from Polymarket data
-              </p>
+            {/* Bottom Stats */}
+            <div className="px-4 py-3 bg-gray-50 border-t border-gray-200">
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div>
+                  <div className="text-base font-bold text-gray-900">12</div>
+                  <div className="text-xs text-gray-500">Markets</div>
+                </div>
+                <div>
+                  <div className="text-base font-bold text-green-600">Live</div>
+                  <div className="text-xs text-gray-500">Status</div>
+                </div>
+                <div>
+                  <div className="text-base font-bold text-gray-900">2:15</div>
+                  <div className="text-xs text-gray-500">Duration</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
