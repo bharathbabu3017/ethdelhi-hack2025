@@ -56,14 +56,33 @@ async function getAgent(topic) {
 }
 
 async function getAllAgents() {
-  const { data, error } = await supabase
+  const { data: agents, error } = await supabase
     .from("agents")
     .select("*")
     .eq("is_active", true)
     .order("created_at");
 
   if (error) throw error;
-  return data;
+
+  // Get the latest briefing for each agent
+  const agentsWithLastGenerated = await Promise.all(
+    agents.map(async (agent) => {
+      const { data: latestBriefing } = await supabase
+        .from("briefings")
+        .select("created_at")
+        .eq("agent_id", agent.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      return {
+        ...agent,
+        lastGenerated: latestBriefing?.created_at || null,
+      };
+    })
+  );
+
+  return agentsWithLastGenerated;
 }
 
 module.exports = {
