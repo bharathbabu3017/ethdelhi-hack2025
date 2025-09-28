@@ -118,30 +118,8 @@ async function generateScript(topic, analysis, newsData) {
     ${JSON.stringify(newsData)}
     
     INSTRUCTIONS:
-    You MUST respond with ONLY a valid JSON object. Do not include any text before or after the JSON. The response must be parseable JSON in this exact format:
-    
-    {
-      "script": "Your 60-90 second radio script here...",
-      "aiInsights": [
-        {
-          "title": "Market Sentiment Analysis",
-          "content": "Brief insight about overall market mood and direction",
-          "source": "Prediction Markets"
-        },
-        {
-          "title": "Key Risk Factors",
-          "content": "Main risks or catalysts identified from news analysis",
-          "source": "News Analysis"
-        },
-        {
-          "title": "Smart Money Positioning",
-          "content": "What institutional or informed traders are doing",
-          "source": "Volume Analysis"
-        }
-      ]
-    }
-    
-    CRITICAL: Return ONLY the JSON object above. No markdown, no explanations, no additional text.
+    Create a 60-90 second radio script focusing on market intelligence with explanations.
+    Return ONLY the script text, no JSON, no formatting, no additional text.
     
     SCRIPT REQUIREMENTS:
     - Create a 60-90 second radio script focusing on market intelligence with explanations
@@ -155,12 +133,6 @@ async function generateScript(topic, analysis, newsData) {
     - End with what this means for listeners or forward-looking insight
     - Strictly under 90 seconds when spoken
     - Use clean text only - no special characters or formatting
-    
-    AI INSIGHTS REQUIREMENTS:
-    - Generate 2-4 concise insights based on the market and news data
-    - Each insight should be 1-2 sentences maximum
-    - Focus on actionable intelligence and key takeaways
-    - Use varied sources (markets, news, volume, sentiment)
     
     Focus: "Here's what the markets are saying, here's WHY they're saying it, and here's what it means for you." Use the context to explain the reasoning behind market positions.`;
   try {
@@ -179,67 +151,10 @@ async function generateScript(topic, analysis, newsData) {
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content;
 
-    console.log("Raw OpenAI response:", content);
+    console.log("Generated script length:", content?.length || 0);
 
-    let result;
-    try {
-      // Try to extract JSON from the content if it's wrapped in markdown or has extra text
-      let jsonContent = content;
-
-      // Look for JSON block markers and extract content between them
-      const jsonMatch =
-        content.match(/```json\s*([\s\S]*?)\s*```/) ||
-        content.match(/```\s*([\s\S]*?)\s*```/);
-      if (jsonMatch) {
-        jsonContent = jsonMatch[1];
-      }
-
-      // Try to find JSON object boundaries if no markdown
-      if (!jsonMatch) {
-        const startIndex = content.indexOf("{");
-        const lastIndex = content.lastIndexOf("}");
-        if (startIndex !== -1 && lastIndex !== -1 && lastIndex > startIndex) {
-          jsonContent = content.substring(startIndex, lastIndex + 1);
-        }
-      }
-
-      console.log("Extracted JSON content:", jsonContent);
-      result = JSON.parse(jsonContent);
-
-      // Validate the result has required fields
-      if (!result.script || !result.aiInsights) {
-        throw new Error("Missing required fields in response");
-      }
-
-      console.log(
-        "Successfully parsed JSON with script length:",
-        result.script.length
-      );
-    } catch (parseError) {
-      console.error("JSON parsing failed:", parseError.message);
-      console.error("Content that failed to parse:", content);
-
-      // Fallback if JSON parsing fails
-      result = {
-        script: content,
-        aiInsights: [
-          {
-            title: "Market Analysis",
-            content:
-              "Markets showing mixed signals with moderate volatility expected.",
-            source: "Prediction Markets",
-          },
-          {
-            title: "Key Developments",
-            content:
-              "Recent news events may impact market sentiment in the short term.",
-            source: "News Analysis",
-          },
-        ],
-      };
-    }
-
-    return result;
+    // Return just the script text
+    return content;
   } catch (error) {
     console.error("OpenAI API Error:", error.message);
     throw error;

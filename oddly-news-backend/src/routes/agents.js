@@ -96,7 +96,6 @@ router.get("/:topic/generate", async (req, res) => {
               duration: latestBriefing.audio_duration,
               marketCount: latestBriefing.market_count,
               marketStats: latestBriefing.market_stats,
-              aiInsights: latestBriefing.ai_insights,
               createdAt: latestBriefing.created_at,
             },
             agent: {
@@ -135,18 +134,11 @@ router.get("/:topic/generate", async (req, res) => {
     // 4. Get news context
     const newsData = await getNewsContext(analysis.searchQueries);
 
-    // 5. Generate script and insights
-    const scriptResult = await generateScript(
-      req.params.topic,
-      analysis,
-      newsData
-    );
+    // 5. Generate script
+    const script = await generateScript(req.params.topic, analysis, newsData);
 
     // 6. Generate audio
-    const audioResult = await generateAudio(
-      scriptResult.script,
-      agent.voice_id
-    );
+    const audioResult = await generateAudio(script, agent.voice_id);
 
     // 7. Upload to Supabase Storage
     const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, "-");
@@ -156,7 +148,7 @@ router.get("/:topic/generate", async (req, res) => {
     // 8. Save briefing to database
     const briefingData = {
       agent_id: agent.id,
-      script: scriptResult.script,
+      script: script,
       audio_url: audioUrl,
       audio_duration: audioResult.estimatedDuration,
       market_count: polymarketData.length,
@@ -164,7 +156,6 @@ router.get("/:topic/generate", async (req, res) => {
       polymarket_data: polymarketData,
       news_data: newsData,
       market_stats: analysis.marketStats,
-      ai_insights: scriptResult.aiInsights,
       metadata: {
         timestamp,
         filename,
@@ -183,7 +174,6 @@ router.get("/:topic/generate", async (req, res) => {
         duration: savedBriefing.audio_duration,
         marketCount: savedBriefing.market_count,
         marketStats: savedBriefing.market_stats,
-        aiInsights: savedBriefing.ai_insights,
         createdAt: savedBriefing.created_at,
       },
       agent: {
