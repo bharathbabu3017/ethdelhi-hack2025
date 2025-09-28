@@ -345,14 +345,17 @@ export default function Dashboard() {
         {/* Header */}
         <header className="bg-white border-b border-gray-200 px-6 py-4 backdrop-blur-sm bg-white/95">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+            <button
+              onClick={() => (window.location.href = "/")}
+              className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
+            >
               <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-700 rounded-xl flex items-center justify-center">
                 <Radio className="w-6 h-6 text-white" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">oddly.news</h1>
               </div>
-            </div>
+            </button>
             <div className="flex items-center space-x-4">
               <div className="h-4 bg-gray-200 rounded w-20 animate-pulse"></div>
               <div className="h-6 bg-gray-200 rounded-full w-16 animate-pulse"></div>
@@ -448,14 +451,17 @@ export default function Dashboard() {
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-6 py-4 backdrop-blur-sm bg-white/95">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+          <button
+            onClick={() => (window.location.href = "/")}
+            className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
+          >
             <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-700 rounded-xl flex items-center justify-center">
               <Radio className="w-6 h-6 text-white" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">oddly.news</h1>
             </div>
-          </div>
+          </button>
           <div className="flex items-center space-x-4">
             <div className="text-sm text-gray-500">
               {agents.length} stations available • Ready first
