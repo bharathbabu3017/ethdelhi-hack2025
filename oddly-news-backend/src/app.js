@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const agentsRoutes = require("./routes/agents");
+const createAgentRoutes = require("./routes/create-agent");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -12,6 +13,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api/agents", agentsRoutes);
+app.use("/api/create-agent", createAgentRoutes);
 
 // Health check
 app.get("/health", (req, res) => {

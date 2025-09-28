@@ -18,7 +18,9 @@ import {
   Copy,
   Check,
   Globe,
+  Plus,
 } from "lucide-react";
+import CreateAgentModal from "./CreateAgentModal";
 
 const API_BASE_URL = "http://localhost:3001/api";
 
@@ -35,6 +37,7 @@ export default function Dashboard() {
   const [countdown, setCountdown] = useState(0);
   const [isPlayerMinimized, setIsPlayerMinimized] = useState(false);
   const [copiedItems, setCopiedItems] = useState({});
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const audioRef = useRef(null);
 
   useEffect(() => {
@@ -281,6 +284,12 @@ export default function Dashboard() {
     }
   };
 
+  const handleAgentCreated = (newAgent) => {
+    // Refresh the agents list
+    fetchAgents();
+    console.log("New agent created:", newAgent);
+  };
+
   const getAgentIcon = (topic) => {
     const icons = {
       politics: "🏛️",
@@ -318,7 +327,7 @@ export default function Dashboard() {
         </header>
 
         {/* Loading Content */}
-        <div className="max-w-7xl mx-auto px-6 py-8 pb-24">
+        <div className="max-w-7xl mx-auto px-6 py-8 pb-32">
           {/* Skeleton Title */}
           <div className="text-center mb-12">
             <div className="h-12 bg-gray-300 rounded-lg w-96 mx-auto mb-4 animate-pulse"></div>
@@ -417,6 +426,13 @@ export default function Dashboard() {
             <div className="text-sm text-gray-500">
               {agents.length} stations available
             </div>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-green-500 to-blue-600 text-white rounded-lg hover:from-green-600 hover:to-blue-700 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create Agent</span>
+            </button>
             <div className="flex items-center space-x-1 text-xs text-green-600 bg-green-50 px-3 py-1 rounded-full">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               <span>Live</span>
@@ -427,7 +443,7 @@ export default function Dashboard() {
 
       <div
         className={`max-w-7xl mx-auto px-6 py-8 ${
-          currentBriefing && (isPlayerMinimized || isPlaying) ? "pb-24" : ""
+          currentBriefing && (isPlayerMinimized || isPlaying) ? "pb-32" : ""
         }`}
       >
         {!currentBriefing || isPlayerMinimized ? (
@@ -581,7 +597,7 @@ export default function Dashboard() {
           </div>
         ) : (
           /* Full Player View */
-          <div className="pb-24">
+          <div className="pb-32">
             {/* Header with Back and Minimize */}
             <div className="flex items-center justify-between mb-6">
               <button
@@ -1035,6 +1051,13 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Create Agent Modal */}
+      <CreateAgentModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onAgentCreated={handleAgentCreated}
+      />
     </div>
   );
 }
