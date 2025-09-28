@@ -118,7 +118,7 @@ async function generateScript(topic, analysis, newsData) {
     ${JSON.stringify(newsData)}
     
     INSTRUCTIONS:
-    Create a JSON response with both the radio script AND AI-driven insights:
+    You MUST respond with ONLY a valid JSON object. Do not include any text before or after the JSON. The response must be parseable JSON in this exact format:
     
     {
       "script": "Your 60-90 second radio script here...",
@@ -140,6 +140,8 @@ async function generateScript(topic, analysis, newsData) {
         }
       ]
     }
+    
+    CRITICAL: Return ONLY the JSON object above. No markdown, no explanations, no additional text.
     
     SCRIPT REQUIREMENTS:
     - Create a 60-90 second radio script focusing on market intelligence with explanations
@@ -177,10 +179,46 @@ async function generateScript(topic, analysis, newsData) {
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content;
 
+    console.log("Raw OpenAI response:", content);
+
     let result;
     try {
-      result = JSON.parse(content);
-    } catch {
+      // Try to extract JSON from the content if it's wrapped in markdown or has extra text
+      let jsonContent = content;
+
+      // Look for JSON block markers and extract content between them
+      const jsonMatch =
+        content.match(/```json\s*([\s\S]*?)\s*```/) ||
+        content.match(/```\s*([\s\S]*?)\s*```/);
+      if (jsonMatch) {
+        jsonContent = jsonMatch[1];
+      }
+
+      // Try to find JSON object boundaries if no markdown
+      if (!jsonMatch) {
+        const startIndex = content.indexOf("{");
+        const lastIndex = content.lastIndexOf("}");
+        if (startIndex !== -1 && lastIndex !== -1 && lastIndex > startIndex) {
+          jsonContent = content.substring(startIndex, lastIndex + 1);
+        }
+      }
+
+      console.log("Extracted JSON content:", jsonContent);
+      result = JSON.parse(jsonContent);
+
+      // Validate the result has required fields
+      if (!result.script || !result.aiInsights) {
+        throw new Error("Missing required fields in response");
+      }
+
+      console.log(
+        "Successfully parsed JSON with script length:",
+        result.script.length
+      );
+    } catch (parseError) {
+      console.error("JSON parsing failed:", parseError.message);
+      console.error("Content that failed to parse:", content);
+
       // Fallback if JSON parsing fails
       result = {
         script: content,

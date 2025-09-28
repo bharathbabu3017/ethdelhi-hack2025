@@ -19,6 +19,8 @@ import {
   Check,
   Globe,
   Plus,
+  Search,
+  X,
 } from "lucide-react";
 import CreateAgentModal from "./CreateAgentModal";
 
@@ -38,6 +40,7 @@ export default function Dashboard() {
   const [isPlayerMinimized, setIsPlayerMinimized] = useState(false);
   const [copiedItems, setCopiedItems] = useState({});
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const audioRef = useRef(null);
 
   useEffect(() => {
@@ -290,6 +293,37 @@ export default function Dashboard() {
     console.log("New agent created:", newAgent);
   };
 
+  // Filter and sort agents
+  const getFilteredAndSortedAgents = () => {
+    let filteredAgents = agents;
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      filteredAgents = agents.filter(
+        (agent) =>
+          agent.display_name
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          agent.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          agent.description
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          agent.ens_subdomain?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Sort: Ready agents first, then by display name
+    return filteredAgents.sort((a, b) => {
+      const aReady = isBriefingRecent(a.lastGenerated);
+      const bReady = isBriefingRecent(b.lastGenerated);
+
+      if (aReady && !bReady) return -1;
+      if (!aReady && bReady) return 1;
+
+      return a.display_name.localeCompare(b.display_name);
+    });
+  };
+
   const getAgentIcon = (topic) => {
     const icons = {
       politics: "🏛️",
@@ -424,7 +458,7 @@ export default function Dashboard() {
           </div>
           <div className="flex items-center space-x-4">
             <div className="text-sm text-gray-500">
-              {agents.length} stations available
+              {agents.length} stations available • Ready first
             </div>
             <button
               onClick={() => setShowCreateModal(true)}
@@ -459,141 +493,191 @@ export default function Dashboard() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {agents.map((agent) => (
-                <div
-                  key={agent.id}
-                  className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:border-green-200 transition-all duration-300 transform hover:-translate-y-1"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="text-2xl">
-                        {getAgentIcon(agent.topic)}
-                      </div>
-                      <div>
-                        <h3 className="text-base font-semibold text-gray-900">
-                          {agent.display_name}
-                        </h3>
-                        {agent.ens_subdomain && (
-                          <div className="flex items-center space-x-2 mt-1">
-                            <div className="flex items-center space-x-1 text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
-                              <Globe className="w-3 h-3" />
-                              <span className="font-medium">
-                                {agent.ens_subdomain}
-                              </span>
-                            </div>
-                            <button
-                              onClick={() =>
-                                copyToClipboard(
-                                  agent.ens_subdomain,
-                                  `ens-${agent.id}`
-                                )
-                              }
-                              className="p-1 hover:bg-gray-100 rounded transition-colors"
-                              title="Copy ENS subdomain"
-                            >
-                              {copiedItems[`ens-${agent.id}`] ? (
-                                <Check className="w-3 h-3 text-green-600" />
-                              ) : (
-                                <Copy className="w-3 h-3 text-gray-400 hover:text-gray-600" />
-                              )}
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    {isBriefingRecent(agent.lastGenerated) ? (
-                      <div className="flex items-center space-x-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span>Ready</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center space-x-1 text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded-full">
-                        <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-                        <span>Stale</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <p className="text-gray-600 text-sm mb-4">
-                    {agent.description}
-                  </p>
-
-                  <div className="flex items-center justify-between mb-4 text-sm text-gray-500">
-                    <div className="flex items-center space-x-1">
-                      <BarChart3 className="w-4 h-4" />
-                      <span>Tag: {agent.tag_id}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Zap className="w-4 h-4" />
-                      <span>${agent.x402_price_usd}</span>
-                    </div>
-                  </div>
-
-                  {/* Last Generated Info */}
-                  <div className="mb-4 p-3 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-100">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600 flex items-center space-x-1">
-                        <Clock className="w-3 h-3" />
-                        <span>Last Report:</span>
-                      </span>
-                      <span className="text-gray-800 font-medium">
-                        {agent.lastGenerated
-                          ? getTimeAgo(agent.lastGenerated)
-                          : "Never"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <button
-                      onClick={() => generateOrLoadBriefing(agent.topic)}
-                      disabled={generatingAgent !== null}
-                      className={`w-full py-3 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 ${
-                        isBriefingRecent(agent.lastGenerated)
-                          ? "bg-green-600 text-white hover:bg-green-700"
-                          : "bg-blue-600 text-white hover:bg-blue-700"
-                      }`}
-                    >
-                      {generatingAgent === agent.topic ? (
-                        <>
-                          <RotateCcw className="w-4 h-4 animate-spin" />
-                          <span>Generating...</span>
-                        </>
-                      ) : isBriefingRecent(agent.lastGenerated) ? (
-                        <>
-                          <Play className="w-4 h-4" />
-                          <span>Listen Now</span>
-                        </>
-                      ) : (
-                        <>
-                          <Zap className="w-4 h-4" />
-                          <span>Generate & Listen</span>
-                        </>
-                      )}
-                    </button>
-
-                    {isBriefingRecent(agent.lastGenerated) && (
-                      <button
-                        onClick={() =>
-                          generateOrLoadBriefing(agent.topic, true)
-                        }
-                        disabled={generatingAgent !== null}
-                        className="w-full border-2 border-green-600 text-green-600 py-2 px-4 rounded-lg hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-                      >
-                        <RotateCcw className="w-4 h-4" />
-                        <span>Generate Fresh Update</span>
-                      </button>
-                    )}
-
-                    <button className="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 flex items-center justify-center space-x-2">
-                      <ExternalLink className="w-4 h-4" />
-                      <span>API Access</span>
-                    </button>
-                  </div>
-                </div>
-              ))}
+            {/* Search Bar */}
+            <div className="max-w-md mx-auto mb-8">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search agents..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white shadow-sm"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+              {searchQuery && (
+                <p className="text-sm text-gray-500 mt-2 text-center">
+                  {getFilteredAndSortedAgents().length} agent
+                  {getFilteredAndSortedAgents().length !== 1 ? "s" : ""} found
+                </p>
+              )}
             </div>
+
+            {getFilteredAndSortedAgents().length === 0 ? (
+              <div className="text-center py-12">
+                <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  No agents found
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  {searchQuery
+                    ? `No agents match "${searchQuery}". Try a different search term.`
+                    : "No agents available at the moment."}
+                </p>
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="text-green-600 hover:text-green-700 font-medium"
+                  >
+                    Clear search
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {getFilteredAndSortedAgents().map((agent) => (
+                  <div
+                    key={agent.id}
+                    className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:border-green-200 transition-all duration-300 transform hover:-translate-y-1"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="text-2xl">
+                          {getAgentIcon(agent.topic)}
+                        </div>
+                        <div>
+                          <h3 className="text-base font-semibold text-gray-900">
+                            {agent.display_name}
+                          </h3>
+                          {agent.ens_subdomain && (
+                            <div className="flex items-center space-x-2 mt-1">
+                              <div className="flex items-center space-x-1 text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
+                                <Globe className="w-3 h-3" />
+                                <span className="font-medium">
+                                  {agent.ens_subdomain}
+                                </span>
+                              </div>
+                              <button
+                                onClick={() =>
+                                  copyToClipboard(
+                                    agent.ens_subdomain,
+                                    `ens-${agent.id}`
+                                  )
+                                }
+                                className="p-1 hover:bg-gray-100 rounded transition-colors"
+                                title="Copy ENS subdomain"
+                              >
+                                {copiedItems[`ens-${agent.id}`] ? (
+                                  <Check className="w-3 h-3 text-green-600" />
+                                ) : (
+                                  <Copy className="w-3 h-3 text-gray-400 hover:text-gray-600" />
+                                )}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      {isBriefingRecent(agent.lastGenerated) ? (
+                        <div className="flex items-center space-x-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          <span>Ready</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center space-x-1 text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded-full">
+                          <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                          <span>Stale</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <p className="text-gray-600 text-sm mb-4">
+                      {agent.description}
+                    </p>
+
+                    <div className="flex items-center justify-between mb-4 text-sm text-gray-500">
+                      <div className="flex items-center space-x-1">
+                        <BarChart3 className="w-4 h-4" />
+                        <span>Tag: {agent.tag_id}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Zap className="w-4 h-4" />
+                        <span>${agent.x402_price_usd}</span>
+                      </div>
+                    </div>
+
+                    {/* Last Generated Info */}
+                    <div className="mb-4 p-3 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-100">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600 flex items-center space-x-1">
+                          <Clock className="w-3 h-3" />
+                          <span>Last Report:</span>
+                        </span>
+                        <span className="text-gray-800 font-medium">
+                          {agent.lastGenerated
+                            ? getTimeAgo(agent.lastGenerated)
+                            : "Never"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <button
+                        onClick={() => generateOrLoadBriefing(agent.topic)}
+                        disabled={generatingAgent !== null}
+                        className={`w-full py-3 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 ${
+                          isBriefingRecent(agent.lastGenerated)
+                            ? "bg-green-600 text-white hover:bg-green-700"
+                            : "bg-blue-600 text-white hover:bg-blue-700"
+                        }`}
+                      >
+                        {generatingAgent === agent.topic ? (
+                          <>
+                            <RotateCcw className="w-4 h-4 animate-spin" />
+                            <span>Generating...</span>
+                          </>
+                        ) : isBriefingRecent(agent.lastGenerated) ? (
+                          <>
+                            <Play className="w-4 h-4" />
+                            <span>Listen Now</span>
+                          </>
+                        ) : (
+                          <>
+                            <Zap className="w-4 h-4" />
+                            <span>Generate & Listen</span>
+                          </>
+                        )}
+                      </button>
+
+                      {isBriefingRecent(agent.lastGenerated) && (
+                        <button
+                          onClick={() =>
+                            generateOrLoadBriefing(agent.topic, true)
+                          }
+                          disabled={generatingAgent !== null}
+                          className="w-full border-2 border-green-600 text-green-600 py-2 px-4 rounded-lg hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                        >
+                          <RotateCcw className="w-4 h-4" />
+                          <span>Generate Fresh Update</span>
+                        </button>
+                      )}
+
+                      <button className="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 flex items-center justify-center space-x-2">
+                        <ExternalLink className="w-4 h-4" />
+                        <span>API Access</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           /* Full Player View */

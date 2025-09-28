@@ -40,7 +40,7 @@ router.post("/", async (req, res) => {
     console.log(`Creating new agent from frontend: ${topic}`);
 
     // Use default voice if not provided
-    const finalVoiceId = voice_id || "pNInz6obpgDQGcFmaJgB";
+    const finalVoiceId = voice_id || "gnPxliFHTp6OK6tcoA6i";
 
     const agent = await createAgentWithWallet({
       topic,
